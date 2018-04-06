@@ -1,0 +1,14 @@
+C:\Users\Ermol\Google Диск\Учёба\3 Курс\Курсач\КОД\CourseWork\CourseWork\bin\Debug\CourseWork.exe.config
+C:\Users\Ermol\Google Диск\Учёба\3 Курс\Курсач\КОД\CourseWork\CourseWork\bin\Debug\CourseWork.exe
+C:\Users\Ermol\Google Диск\Учёба\3 Курс\Курсач\КОД\CourseWork\CourseWork\bin\Debug\CourseWork.pdb
+C:\Users\Ermol\Google Диск\Учёба\3 Курс\Курсач\КОД\CourseWork\CourseWork\obj\Debug\CourseWork.csprojResolveAssemblyReference.cache
+C:\Users\Ermol\Google Диск\Учёба\3 Курс\Курсач\КОД\CourseWork\CourseWork\obj\Debug\CourseWork.MainWindow.resources
+C:\Users\Ermol\Google Диск\Учёба\3 Курс\Курсач\КОД\CourseWork\CourseWork\obj\Debug\CourseWork.Properties.Resources.resources
+C:\Users\Ermol\Google Диск\Учёба\3 Курс\Курсач\КОД\CourseWork\CourseWork\obj\Debug\CourseWork.csproj.GenerateResource.cache
+C:\Users\Ermol\Google Диск\Учёба\3 Курс\Курсач\КОД\CourseWork\CourseWork\obj\Debug\CourseWork.csproj.CoreCompileInputs.cache
+C:\Users\Ermol\Google Диск\Учёба\3 Курс\Курсач\КОД\CourseWork\CourseWork\obj\Debug\CourseWork.csproj.CopyComplete
+C:\Users\Ermol\Google Диск\Учёба\3 Курс\Курсач\КОД\CourseWork\CourseWork\obj\Debug\CourseWork.exe
+C:\Users\Ermol\Google Диск\Учёба\3 Курс\Курсач\КОД\CourseWork\CourseWork\obj\Debug\CourseWork.pdb
+C:\Users\Ermol\Google Диск\Учёба\3 Курс\Курсач\КОД\CourseWork\CourseWork\bin\Debug\Cloo.dll
+C:\Users\Ermol\Google Диск\Учёба\3 Курс\Курсач\КОД\CourseWork\CourseWork\bin\Debug\OpenCLTemplate.dll
+C:\Users\Ermol\Google Диск\Учёба\3 Курс\Курсач\КОД\CourseWork\CourseWork\obj\Debug\CourseWork.HelpForm.resources
