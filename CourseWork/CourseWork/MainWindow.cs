@@ -18,7 +18,8 @@ namespace CourseWork
     {
         private Color colorStart, colorFinish; //Ranga of Colors
         private int fileCount = 0; //Count of files
-        private string path; ///Path to the directory with data
+        private string path; //Path to the directory with data
+        private string[] sourseCode; //Код FFT
 
         public MainWindow()
         {
@@ -46,10 +47,11 @@ namespace CourseWork
                     depthBoxFinish.Text = Convert.ToString(fileCount);
                     progressBar.Value = 0;
                     progressBar.Maximum = fileCount;
+                    spectrGroupBox.Enabled = true;
+                    depthGroupBox.Enabled = true;
                 }
 
-                spectrGroupBox.Enabled = true;
-                depthGroupBox.Enabled = true;
+              //  finishTime.Text 
             }
             catch
             {
@@ -77,12 +79,67 @@ namespace CourseWork
             }
         }
 
+        //Create kernel code
+        private void CreateCode()
+        {
+            StreamReader sr = new StreamReader("FFT.cl");
+            List<string> l = new List<string>();
+            string str = "";
+            while (str!=null)
+            {
+                str = sr.ReadLine();
+                if (str != null)
+                    l.Add(str);
+            }
+            sourseCode = l.ToArray();
+        }
+
         //Start
         private void startButton_Click(object sender, EventArgs e)
         {
             //Время начала работы (для статистики)
-            startTime.Text = DateTime.Now.ToString(); 
+            startTime.Text = DateTime.Now.ToString();
+            
+            CLCalc.InitCL(ComputeDeviceTypes.All); //Инициализируем все доступные GPU и СPU (без аргументов только GPU)
+            List<ComputeDevice> Devices = CLCalc.CLDevices; //Собираем их вместе
 
+            CLCalc.Program.DefaultCQ = 0; //Выбираем устройсто
+
+            CreateCode();
+            CLCalc.Program.Compile(sourseCode); //Компилим код
+
+            CLCalc.Program.Kernel FFT = new CLCalc.Program.Kernel("FFT"); //Задаём главную функцию
+
+            var n = 5;
+            float[] v1 = new float[n], v2 = new float[n];
+
+            //Инициализация и присвоение векторов, которые мы будем складывать.
+            for (int i = 0; i < n; i++)
+            {
+                v1[i] = i;
+                v2[i] = i * 2;
+            }
+
+            //Загружаем вектора в память устройства
+            CLCalc.Program.Variable varV1 = new CLCalc.Program.Variable(v1);
+            CLCalc.Program.Variable varV2 = new CLCalc.Program.Variable(v2);
+
+            //Объявление того, кто из векторов кем является
+            CLCalc.Program.Variable[] args = new CLCalc.Program.Variable[] { varV1, varV2 };
+
+            //Сколько потоков будет запущенно
+            int[] workers = new int[1] { n };
+
+            //Исполняем ядро VectorSum с аргументами args и колличеством потоков workers
+            FFT.Execute(args, workers);
+
+            //выгружаем из памяти
+            varV1.ReadFromDeviceTo(v1);
+
+            for (int i=0;i<n;i++)
+            {
+                MessageBox.Show(v1[i].ToString());
+            }
         }
 
         //Chenging depth

@@ -12,3 +12,4 @@ C:\Users\Ermol\Google Диск\Учёба\3 Курс\Курсач\КОД\CourseW
 C:\Users\Ermol\Google Диск\Учёба\3 Курс\Курсач\КОД\CourseWork\CourseWork\bin\Debug\Cloo.dll
 C:\Users\Ermol\Google Диск\Учёба\3 Курс\Курсач\КОД\CourseWork\CourseWork\bin\Debug\OpenCLTemplate.dll
 C:\Users\Ermol\Google Диск\Учёба\3 Курс\Курсач\КОД\CourseWork\CourseWork\obj\Debug\CourseWork.HelpForm.resources
+C:\Users\Ermol\Google Диск\Учёба\3 Курс\Курсач\КОД\CourseWork\CourseWork\bin\Debug\FFT.cl

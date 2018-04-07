@@ -28,12 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.DataPoint dataPoint7 = new System.Windows.Forms.DataVisualization.Charting.DataPoint(1D, 1D);
-            System.Windows.Forms.DataVisualization.Charting.DataPoint dataPoint8 = new System.Windows.Forms.DataVisualization.Charting.DataPoint(3D, 12D);
-            System.Windows.Forms.DataVisualization.Charting.DataPoint dataPoint9 = new System.Windows.Forms.DataVisualization.Charting.DataPoint(2D, 2D);
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.DataPoint dataPoint4 = new System.Windows.Forms.DataVisualization.Charting.DataPoint(1D, 1D);
+            System.Windows.Forms.DataVisualization.Charting.DataPoint dataPoint5 = new System.Windows.Forms.DataVisualization.Charting.DataPoint(3D, 12D);
+            System.Windows.Forms.DataVisualization.Charting.DataPoint dataPoint6 = new System.Windows.Forms.DataVisualization.Charting.DataPoint(2D, 2D);
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.файлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openButton = new System.Windows.Forms.ToolStripMenuItem();
@@ -126,24 +126,24 @@
             // 
             // chart
             // 
-            chartArea3.Name = "ChartArea1";
-            this.chart.ChartAreas.Add(chartArea3);
-            legend3.Name = "Legend1";
-            this.chart.Legends.Add(legend3);
+            chartArea2.Name = "ChartArea1";
+            this.chart.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            this.chart.Legends.Add(legend2);
             this.chart.Location = new System.Drawing.Point(7, 20);
             this.chart.Name = "chart";
             this.chart.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            series3.ChartArea = "ChartArea1";
-            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-            series3.Legend = "Legend1";
-            series3.Name = "Series1";
-            dataPoint7.MarkerColor = System.Drawing.Color.Black;
-            dataPoint8.MarkerColor = System.Drawing.Color.Red;
-            dataPoint9.MarkerColor = System.Drawing.Color.Blue;
-            series3.Points.Add(dataPoint7);
-            series3.Points.Add(dataPoint8);
-            series3.Points.Add(dataPoint9);
-            this.chart.Series.Add(series3);
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            dataPoint4.MarkerColor = System.Drawing.Color.Black;
+            dataPoint5.MarkerColor = System.Drawing.Color.Red;
+            dataPoint6.MarkerColor = System.Drawing.Color.Blue;
+            series2.Points.Add(dataPoint4);
+            series2.Points.Add(dataPoint5);
+            series2.Points.Add(dataPoint6);
+            this.chart.Series.Add(series2);
             this.chart.Size = new System.Drawing.Size(641, 507);
             this.chart.TabIndex = 0;
             this.chart.Text = "Спектрограмма";
