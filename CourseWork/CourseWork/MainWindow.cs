@@ -94,52 +94,99 @@ namespace CourseWork
             sourseCode = l.ToArray();
         }
 
+        //Для степени двойки
+        private short[] PowOfTwo(short[] soundLine)
+        {
+            int len = soundLine.Length;
+            uint pow = 2;
+            while (len > pow)
+            {
+                pow *= 2;
+            }
+
+            if (len == pow)
+                return soundLine;
+            else
+            {
+                short[] newMas = new short[pow];
+                for (int i =0;i<pow;i++)
+                {
+                    if (i < len)
+                        newMas[i] = soundLine[i];
+                    else
+                        newMas[i] = 0;
+                }
+
+                return newMas;
+            }
+        }
+
         //Start
         private void startButton_Click(object sender, EventArgs e)
         {
             //Время начала работы (для статистики)
             startTime.Text = DateTime.Now.ToString();
             
-            CLCalc.InitCL(ComputeDeviceTypes.All); //Инициализируем все доступные GPU и СPU (без аргументов только GPU)
+            CLCalc.InitCL(); //Инициализируем все доступные GPU и СPU (без аргументов только GPU)
             List<ComputeDevice> Devices = CLCalc.CLDevices; //Собираем их вместе
 
-            CLCalc.Program.DefaultCQ = 0; //Выбираем устройсто
+            CLCalc.Program.DefaultCQ = 0; //Выбираем устройство
 
             CreateCode();
             CLCalc.Program.Compile(sourseCode); //Компилим код
 
             CLCalc.Program.Kernel FFT = new CLCalc.Program.Kernel("FFT"); //Задаём главную функцию
 
-            var n = 5;
-            float[] v1 = new float[n], v2 = new float[n];
+            string[] fileList;
+            fileList = Directory.GetFiles(path);
+            fileCount = fileList.Length;
 
-            //Инициализация и присвоение векторов, которые мы будем складывать.
-            for (int i = 0; i < n; i++)
+            short[][] Data = new short[fileCount][]; //Массив с данными для вычислений
+            int counter = 0;
+            foreach (var file in fileList)
             {
-                v1[i] = i;
-                v2[i] = i * 2;
+                byte[] byteMas;
+                byteMas = File.ReadAllBytes(file);
+                short[] soundLine = byteMas.Select(i => (Int16)i).ToArray(); //Из байтов в Int16
+
+                Data[counter] = PowOfTwo(soundLine);
+
+                //Сборщик мусора
+                byteMas = null; //Удаляем ссылку
+                GC.Collect(); //Запуск сборщика мусора; Мусор- это всё, на что не указывает ссылка
+
+                
             }
 
-            //Загружаем вектора в память устройства
-            CLCalc.Program.Variable varV1 = new CLCalc.Program.Variable(v1);
-            CLCalc.Program.Variable varV2 = new CLCalc.Program.Variable(v2);
+            //CLCalc.Program.Variable varData = new CLCalc.Program.Variable(Data);
+            //CLCalc.Program.Variable varCount = new CLCalc.Program.Variable();
 
-            //Объявление того, кто из векторов кем является
-            CLCalc.Program.Variable[] args = new CLCalc.Program.Variable[] { varV1, varV2 };
+            //var n = 7000000;
+            //float[] v1 = new float[n], v2 = new float[n];
 
-            //Сколько потоков будет запущенно
-            int[] workers = new int[1] { n };
+            ////Инициализация и присвоение векторов, которые мы будем складывать.
+            //for (int i = 0; i < n; i++)
+            //{
+            //    v1[i] = i;
+            //    v2[i] = i * 2;
+            //}
 
-            //Исполняем ядро VectorSum с аргументами args и колличеством потоков workers
-            FFT.Execute(args, workers);
+            ////Загружаем вектора в память устройства
+            //CLCalc.Program.Variable varV1 = new CLCalc.Program.Variable(v1);
+            //CLCalc.Program.Variable varV2 = new CLCalc.Program.Variable(v2);
 
-            //выгружаем из памяти
-            varV1.ReadFromDeviceTo(v1);
+            ////Объявление того, кто из векторов кем является
+            //CLCalc.Program.Variable[] args = new CLCalc.Program.Variable[] { varV1, varV2 };
 
-            for (int i=0;i<n;i++)
-            {
-                MessageBox.Show(v1[i].ToString());
-            }
+            ////Сколько потоков будет запущенно
+            //int[] workers = new int[1] { n };
+
+            ////Исполняем ядро VectorSum с аргументами args и колличеством потоков workers
+            //FFT.Execute(args, workers);
+
+            ////выгружаем из памяти
+            //varV1.ReadFromDeviceTo(v1);
+            //finishTime.Text = DateTime.Now.ToString();
         }
 
         //Chenging depth

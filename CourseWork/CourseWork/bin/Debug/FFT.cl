@@ -1,3 +1,8 @@
+struct Complex {
+    int real;
+    int unreal;
+};
+
 __kernel void FFT(__global float * v1, __global float * v2)
 	{
 	 int i = get_global_id(0);
