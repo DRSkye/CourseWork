@@ -3,8 +3,8 @@ struct Complex {
     int unreal;
 };
 
-__kernel void FFT(__global float * v1, __global float * v2)
+__kernel void FFT(__global short * dataMas, __global short * NMas, __global short * LenMas)
 	{
 	 int i = get_global_id(0);
-	 v1[i] = v1[i] + v2[i];
+	 dataMas[i] = 2 * dataMas[i];
 	}
