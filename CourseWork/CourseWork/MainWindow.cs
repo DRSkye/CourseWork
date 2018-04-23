@@ -95,15 +95,18 @@ namespace CourseWork
         }
 
         //Для степени двойки
-        private short[] PowOfTwo(short[] soundLine)
+        private short[] PowOfTwo(short[] soundLine, short K)
         {
             int len = soundLine.Length;
             uint pow = 2;
+            short k = 1;
             while (len > pow)
             {
                 pow *= 2;
+                k++;
             }
 
+            K = k;
             if (len == pow)
                 return soundLine;
             else
@@ -130,18 +133,23 @@ namespace CourseWork
             CLCalc.InitCL(); //Инициализируем все доступные GPU и СPU (без аргументов только GPU)
             List<ComputeDevice> Devices = CLCalc.CLDevices; //Собираем их вместе
 
+            if (Devices.Count==0)
+            {
+                MessageBox.Show("Ваши устройства не поддерживают OpenCL!");
+                Close();
+            }
+
             CLCalc.Program.DefaultCQ = 0; //Выбираем устройство
 
             CreateCode();
             CLCalc.Program.Compile(sourseCode); //Компилим код
 
-            CLCalc.Program.Kernel FFT = new CLCalc.Program.Kernel("FFT"); //Задаём главную функцию
+            CLCalc.Program.Kernel FFT = new CLCalc.Program.Kernel("fFT"); //Задаём главную функцию
 
             string[] fileList;
             fileList = Directory.GetFiles(path);
             fileCount = fileList.Length;
            
-
             PerformanceCounter ramCounter = new PerformanceCounter("Memory", "Available MBytes"); //Показатель памяти
             bool stop = false;
             int fileIndex = 0;
@@ -150,6 +158,7 @@ namespace CourseWork
 
             while (fileIndex < fileCount) //Проверить!
             {
+                short K=0; //Степень
                 //Оставляем в запасе 1 гб оперативы с учётом того, что потребуется не больше 200 мб на вычисление звуковой дорожки
                 while (!stop && ramCounter.NextValue()-1024 > 200 ) 
                 {
@@ -163,7 +172,8 @@ namespace CourseWork
                         soundLine[i / 2] = BitConverter.ToInt16(b, 0);
                     }
 
-                    Data.Add(PowOfTwo(soundLine));
+                    soundLine = (short[])PowOfTwo(soundLine, K).Clone();
+                    Data.Add(soundLine);
                     
                     //Сборщик мусора
                     byteMas = null; //Удаляем ссылку
@@ -177,8 +187,9 @@ namespace CourseWork
 
                 //Вычисляем, что считали
                 dataMas = new short[Data.Count*Data[0].Length];
-                int[] NMas = new int[] { Data.Count };
-                int[] LenMas = new int[] { Data[0].Length };
+                int[] NMas = new int[] { Data.Count }; //Кол потоков
+                short[] Pow = new short[] { K }; //Степень
+                int[] LenMas = new int[] { Data[0].Length }; //Длина одной дорожки
                 var count = 0;
                 for (int i = 0; i < Data.Count; i++)
                 {
@@ -190,19 +201,24 @@ namespace CourseWork
                 }
                 Data.Clear();
 
+                //Массив для ответов
+                //int endLen = 
+                float[] ResultMas = new float[Data.Count *  30000];
+
                 //Загружаем Даные в память устройства
                 CLCalc.Program.Variable varData = new CLCalc.Program.Variable(dataMas);
-                CLCalc.Program.Variable varNMas = new CLCalc.Program.Variable(NMas);
+                CLCalc.Program.Variable varPow = new CLCalc.Program.Variable(Pow);
                 CLCalc.Program.Variable varLenMas = new CLCalc.Program.Variable(LenMas);
+                CLCalc.Program.Variable varResult = new CLCalc.Program.Variable(ResultMas);
 
                 //Объявление массив агрументов функции kernel
-                CLCalc.Program.Variable[] args = new CLCalc.Program.Variable[] { varData, varNMas, varLenMas };
+                CLCalc.Program.Variable[] args = new CLCalc.Program.Variable[] { varData, varPow, varLenMas, varResult };
 
                 //Исполняем ядро FFT с аргументами args и колличеством потоков NMas
                 FFT.Execute(args, NMas);
 
                 //выгружаем из памяти
-                varData.ReadFromDeviceTo(dataMas);
+                varResult.ReadFromDeviceTo(ResultMas);
             }
 
             finishTime.Text = DateTime.Now.ToString();
