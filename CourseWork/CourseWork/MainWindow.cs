@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Management;
 using System.Windows.Forms;
 using Cloo;
 using OpenCLTemplate;
@@ -95,7 +96,7 @@ namespace CourseWork
         }
 
         //Для степени двойки
-        private short[] PowOfTwo(short[] soundLine, short K)
+        private short[] PowOfTwo(short[] soundLine,ref short K)
         {
             int len = soundLine.Length;
             uint pow = 2;
@@ -128,6 +129,8 @@ namespace CourseWork
         private void startButton_Click(object sender, EventArgs e)
         {
             //Время начала работы (для статистики)
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
             startTime.Text = DateTime.Now.ToString();
 
             CLCalc.InitCL(); //Инициализируем все доступные GPU и СPU (без аргументов только GPU)
@@ -149,8 +152,24 @@ namespace CourseWork
             string[] fileList;
             fileList = Directory.GetFiles(path);
             fileCount = fileList.Length;
-           
+
+            uint VideoMem=0; //количесто видеопамяти
             PerformanceCounter ramCounter = new PerformanceCounter("Memory", "Available MBytes"); //Показатель памяти
+
+            try
+            {
+                ManagementObjectSearcher searcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_VideoController"); //Иформация о видеокарте
+                foreach (var mem in searcher.Get())
+                {
+                    VideoMem = (uint)mem["AdapterRAM"] / 1024 / 1024;
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Видеокарта не найдена!");
+                Close();
+            }
+
             bool stop = false;
             int fileIndex = 0;
             List<short[]> Data = new List<short[]>();
@@ -159,8 +178,9 @@ namespace CourseWork
             while (fileIndex < fileCount) //Проверить!
             {
                 short K=0; //Степень
+                uint memUsed = 0; //использовано памяти
                 //Оставляем в запасе 1 гб оперативы с учётом того, что потребуется не больше 200 мб на вычисление звуковой дорожки
-                while (!stop && ramCounter.NextValue()-1024 > 200 ) 
+                while (!stop && ramCounter.NextValue() - 1024 > 200 && memUsed < VideoMem - 512) 
                 {
                     byte[] byteMas;
                     byteMas = File.ReadAllBytes(fileList[fileIndex]);
@@ -172,8 +192,9 @@ namespace CourseWork
                         soundLine[i / 2] = BitConverter.ToInt16(b, 0);
                     }
 
-                    soundLine = (short[])PowOfTwo(soundLine, K).Clone();
+                    soundLine = (short[])PowOfTwo(soundLine,ref K).Clone();
                     Data.Add(soundLine);
+                    memUsed += (uint)Data[0].Length /1024 /512;
                     
                     //Сборщик мусора
                     byteMas = null; //Удаляем ссылку
@@ -181,6 +202,7 @@ namespace CourseWork
                     GC.Collect(); //Запуск сборщика мусора; Мусор- это всё, на что не указывает ссылка
 
                     fileIndex++;
+                    progressBar.Value += 1;
                     if (fileIndex == fileCount)
                         stop = true;
                 }
@@ -202,8 +224,9 @@ namespace CourseWork
                 Data.Clear();
 
                 //Массив для ответов
-                //int endLen = 
-                float[] ResultMas = new float[Data.Count *  30000];
+                float[] ResultMas = new float[NMas[0] *  30000];
+                for (uint i = 0; i < ResultMas.Length; i++)
+                    ResultMas[i] = 0;
 
                 //Загружаем Даные в память устройства
                 CLCalc.Program.Variable varData = new CLCalc.Program.Variable(dataMas);
@@ -214,14 +237,20 @@ namespace CourseWork
                 //Объявление массив агрументов функции kernel
                 CLCalc.Program.Variable[] args = new CLCalc.Program.Variable[] { varData, varPow, varLenMas, varResult };
 
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
                 //Исполняем ядро FFT с аргументами args и колличеством потоков NMas
                 FFT.Execute(args, NMas);
 
                 //выгружаем из памяти
                 varResult.ReadFromDeviceTo(ResultMas);
+                sw.Stop();
+                MessageBox.Show("Время работы видеокарты: " + (timer.Elapsed).ToString());
             }
 
             finishTime.Text = DateTime.Now.ToString();
+            timer.Stop();
+            MessageBox.Show((timer.Elapsed).ToString());
         }
 
         //Chenging depth
